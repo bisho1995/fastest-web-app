@@ -6,11 +6,12 @@ Here is what I am going to do:
 
 1. Use Preact instead of react
 2. Use service worker and employ offline cache
-3. USe SSR
-4. Differential bundling
-5. Preload
-6. Prerender
-7. Code splitting -> All files under /routes and /components/async are code splitted
+3. Use SSR
+4. Use AMP
+5. Differential bundling
+6. Preload
+7. Prerender
+8. Code splitting -> All files under /routes and /components/async are code splitted
 
 Also I am going to follow the recommendations of these resources
 
