@@ -1,55 +1,66 @@
-/*global globalThis*/
+interface IProps {
+  icon?: string
+  badge?: string
+}
 
 export default class Notification {
-	private _registration: undefined | ServiceWorkerRegistration;
-	private _navigator: Navigator|undefined;
-	private _requestingPermission: undefined | boolean;
-	private _permissionGranted: undefined|boolean
+  private _registration: undefined | ServiceWorkerRegistration;
 
-	constructor(private icon: string, private badge?: string) {
-		this._navigator = globalThis.navigator
-		window.navigator
+  private _navigator: Navigator|undefined;
 
-		this.requestPermission();
+  private _requestingPermission: undefined | boolean;
 
-	}
+  private _permissionGranted: undefined|boolean
 
-	public requestPermission(): Promise<any> {
-		return new Promise((resolve, reject)=>{
-			if(!this.isNotificationAvailable()) return reject(new Error("Notification API is not available in browser/device"))
+  private _icon: string|undefined;
 
-			this._requestingPermission = true;
-			globalThis.Notification.requestPermission()
-				.then((permission: NotificationPermission) => {
-					if(permission !== "granted") {
-						return reject(new Error(`Notification Permission was denied by user, exiting`))
-					}
+  private _badge: string|undefined;
 
-					this._permissionGranted = true
+  private _requestedPermission:boolean
 
-				this._navigator?.serviceWorker.getRegistration().then((r)=>{
-					this._registration=r
-					resolve()
-				}).catch((err=>{
-					return reject(`Could not get service worker registration, unable to proceed ${err.reason}`)
-				}))
-				})
-				.catch((err) => {
-					console.error(
-						`[Notification:constructor] failed to request permission`,
-						err
-					);
-				})
-				.finally(() => {
-					this._requestingPermission = false;
-				});
-		})
+  constructor({ icon, badge }: IProps) {
+    this._navigator = globalThis.navigator;
+    this._icon = icon;
+    this._badge = badge;
+    this._requestedPermission = false;
+  }
 
-	}
+  public requestPermission(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (!Notification.isNotificationAvailable()) {
+        this._requestedPermission = true;
+        return reject(new Error('Notification API is not available in browser/device'));
+      }
 
-	public isNotificationAvailable(): boolean {
-		return !!globalThis.Notification;
-	}
+      this._requestingPermission = true;
+      globalThis.Notification.requestPermission()
+        .then((permission: NotificationPermission) => {
+          if (permission !== 'granted') {
+            return reject(new Error('Notification Permission was denied by user, exiting'));
+          }
 
-	public showNotification(): void {}
+          this._permissionGranted = true;
+
+          this._navigator?.serviceWorker.getRegistration().then((r) => {
+            this._registration = r;
+            resolve();
+          }).catch(((err) => reject(new Error(`Could not get service worker registration, unable to proceed ${err.reason}`))));
+        })
+        .catch((err) => {
+          console.error(
+            '[Notification:constructor] failed to request permission',
+            err,
+          );
+        })
+        .finally(() => {
+          this._requestingPermission = false;
+        });
+    });
+  }
+
+  public static isNotificationAvailable(): boolean {
+    return !!globalThis.Notification;
+  }
+
+  public static showNotification(): void {}
 }
