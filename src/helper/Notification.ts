@@ -1,3 +1,10 @@
+/* eslint "no-param-reassign": 0 */
+
+// eslint-disable-next-line no-undef
+interface NotificationProps extends NotificationOptions{
+  title: string
+}
+
 interface IProps {
   icon?: string
   badge?: string
@@ -10,7 +17,7 @@ export default class Notification {
 
   private _requestingPermission: undefined | boolean;
 
-  private _permissionGranted: undefined|boolean
+  private _permissionGranted: boolean
 
   private _icon: string|undefined;
 
@@ -23,6 +30,8 @@ export default class Notification {
     this._icon = icon;
     this._badge = badge;
     this._requestedPermission = false;
+    this._permissionGranted = Notification.isPermissionGranted();
+    this._getServiceWorkerRegistration().then((r) => this._registration = r);
   }
 
   public requestPermission(): Promise<any> {
@@ -41,10 +50,10 @@ export default class Notification {
 
           this._permissionGranted = true;
 
-          this._navigator?.serviceWorker.getRegistration().then((r) => {
+          this._getServiceWorkerRegistration().then((r) => {
             this._registration = r;
             resolve();
-          }).catch(((err) => reject(new Error(`Could not get service worker registration, unable to proceed ${err.reason}`))));
+          }).catch((err) => reject(new Error(`Could not get service worker registration, unable to proceed ${err.reason}`)));
         })
         .catch((err) => {
           console.error(
@@ -58,9 +67,34 @@ export default class Notification {
     });
   }
 
+  private _getServiceWorkerRegistration():Promise<ServiceWorkerRegistration> {
+    return new Promise((resolve, reject) => {
+      this._navigator?.serviceWorker.getRegistration().then(resolve).catch(reject);
+    });
+  }
+
   public static isNotificationAvailable(): boolean {
     return !!globalThis.Notification;
   }
 
-  public static showNotification(): void {}
+  public static isPermissionGranted() {
+    return globalThis?.Notification.permission === 'granted';
+  }
+
+  public showNotification({ title, ...options }: NotificationProps): void {
+    if (!Notification.isPermissionGranted() || !this._requestedPermission) {
+      this.requestPermission().then(() => {
+        if (!this._registration) {
+          this._getServiceWorkerRegistration().then((r) => {
+            this._registration = r;
+
+            if (!options.icon) options.icon = this._icon;
+            if (!options.badge) options.badge = this._badge;
+
+            this._registration.showNotification(title, options);
+          });
+        }
+      });
+    }
+  }
 }
