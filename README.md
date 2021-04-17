@@ -36,3 +36,8 @@ Also I am going to follow the recommendations of these resources
 For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
 
 Best helper for preact: [https://nicedoc.io/preactjs/preact-cli#webpack](https://nicedoc.io/preactjs/preact-cli#webpack)
+
+## Notifications
+
+It is not a web app unless it shows notifications. To check the guide of notifications follow this [codesandbox url](https://codesandbox.io/s/sw-1-n6730?file=/index.html).
+This [Notifications](https://github.com/bisho1995/fastest-web-app/blob/main/src/helper/Notification.ts) class in this project is intended to handle notifications.
