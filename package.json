@@ -53,5 +53,20 @@
       "<rootDir>/tests/__mocks__/browserMocks.ts",
       "<rootDir>/tests/__mocks__/setupTests.ts"
     ]
-  }
+  },
+  "description": "This is going to be the fastest realistic webapp on the planet. I added the word realistic as I understand vanilla JS is fastest, but that is not scalable to a team of engineers working on aproject.",
+  "main": ".eslintrc.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bisho1995/fastest-web-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/bisho1995/fastest-web-app/issues"
+  },
+  "homepage": "https://github.com/bisho1995/fastest-web-app#readme"
 }
