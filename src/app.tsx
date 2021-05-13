@@ -1,5 +1,6 @@
 import { FunctionalComponent, h } from "preact";
 import { Route, Router } from "preact-router";
+import "tailwindcss/dist/tailwind.css";
 
 import Home from "./routes/home";
 import Profile from "./routes/profile";
