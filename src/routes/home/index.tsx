@@ -13,13 +13,16 @@ interface IPodcastState extends IPodcast {
 interface Props {}
 interface State {
   podcasts: IPodcastState[];
+  playing: IPodcastState | null;
 }
 
 export default class Home extends Component<Props, State> {
   state = {
     podcasts: [],
+    playing: null,
   };
   async componentDidMount() {
+    console.log("did mount");
     if (globalThis?.navigator?.storage?.persist) {
       globalThis.navigator.storage.persist().then((persistent) => {
         console.log(persistent);
@@ -46,6 +49,7 @@ export default class Home extends Component<Props, State> {
         this.setState({ podcasts });
       }
 
+      console.log("fetching podcasts");
       podcastService
         .fetchPodcasts((networkFeed) => {
           cache.put("/feed", networkFeed.clone());
@@ -69,8 +73,9 @@ export default class Home extends Component<Props, State> {
     }
   }
   render() {
-    const { podcasts } = this.state;
-    console.log(podcasts);
+    const { podcasts, playing } = this.state;
+    console.log(podcasts, playing);
+    console.log("render");
     return (
       <div class={style.home}>
         <h1 class={style["site-title"]}>
@@ -79,8 +84,8 @@ export default class Home extends Component<Props, State> {
             alt="HTTP 203 Podcast"
           />
         </h1>
-        {podcasts.map((podcast: IPodcast) => {
-          const { id, title, subtitle, image } = podcast;
+        {podcasts.map((podcast: IPodcastState) => {
+          const { id, title, subtitle, image, state } = podcast;
           return (
             <div key={id} class="flex flex-row">
               <img src={image} width={100} height={100} />
@@ -88,7 +93,11 @@ export default class Home extends Component<Props, State> {
                 <div
                   class="font-semibold leading-5"
                   onClick={() => {
-                    podcastService.downloadPodcast(podcast);
+                    if (state === "not-stored") {
+                      podcastService.downloadPodcast(podcast);
+                    } else {
+                      this.setState({ playing: podcast });
+                    }
                   }}
                 >
                   {title}
@@ -98,6 +107,11 @@ export default class Home extends Component<Props, State> {
             </div>
           );
         })}
+        {playing && (
+          <div id={style.player} class="sticky bottom-0 flex justify-center">
+            <audio controls autoPlay crossOrigin="true" src={playing!.src} />
+          </div>
+        )}
       </div>
     );
   }
