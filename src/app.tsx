@@ -1,12 +1,12 @@
-import { FunctionalComponent, h } from 'preact';
-import { Route, Router } from 'preact-router';
+import { FunctionalComponent, h } from "preact";
+import { Route, Router } from "preact-router";
 
-import { useEffect } from 'preact/hooks';
-import Home from './routes/home';
-import Profile from './routes/profile';
-import NotFoundPage from './routes/notfound';
-import Header from './components/header';
+import Home from "./routes/home";
+import Profile from "./routes/profile";
+import NotFoundPage from "./routes/notfound";
+import Header from "./components/header";
 
+console.clear();
 const App: FunctionalComponent = () => (
   <div id="preact_root">
     <Header />

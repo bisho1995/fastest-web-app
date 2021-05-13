@@ -2,20 +2,35 @@
   "name": "preact1",
   "short_name": "preact1",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fff",
   "theme_color": "#673ab8",
   "icons": [
     {
-      "src": "/assets/icons/android-chrome-192x192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "https://cdn.glitch.com/6801d344-cd53-4f92-aedc-9202eb8d91c4%2Ficon.jpg?1538739694463",
+      "sizes": "512x512",
+      "purpose": "maskable",
+      "type": "image/jpeg"
     },
     {
-      "src": "/assets/icons/android-chrome-512x512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "src": "https://cdn.glitch.com/6801d344-cd53-4f92-aedc-9202eb8d91c4%2Ficon-small.jpg?1538832962747",
+      "sizes": "192x192",
+      "purpose": "maskable",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://cdn.glitch.com/6801d344-cd53-4f92-aedc-9202eb8d91c4%2Ficon-large.png?1538833411634",
+      "sizes": "512x512",
+      "purpose": "maskable",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn.glitch.com/6801d344-cd53-4f92-aedc-9202eb8d91c4%2Ficon-small.png?1538833411634",
+      "sizes": "192x192",
+      "purpose": "maskable",
+      "type": "image/png"
     }
   ]
 }

@@ -1,5 +1,18 @@
 .home {
-	padding: 56px 20px;
-	min-height: 100%;
-	width: 100%;
+  padding: 56px 0px;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.site-title {
+  position: relative;
+  margin: 0;
+  background: #000;
+
+  img {
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: block;
+  }
 }
