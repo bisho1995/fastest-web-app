@@ -58,12 +58,20 @@ export default class Home extends Component<Props, State> {
             alt="HTTP 203 Podcast"
           />
         </h1>
-        {podcasts.map(({ id, title, subtitle, image }: IPodcast) => {
+        {podcasts.map((podcast: IPodcast) => {
+          const { id, title, subtitle, image } = podcast;
           return (
             <div key={id} class="flex flex-row">
               <img src={image} width={100} height={100} />
               <div class="flex flex-col flex-1  ">
-                <div class="font-semibold leading-5">{title}</div>
+                <div
+                  class="font-semibold leading-5"
+                  onClick={() => {
+                    podcastService.downloadPodcast(podcast);
+                  }}
+                >
+                  {title}
+                </div>
                 <div>{subtitle}</div>
               </div>
             </div>

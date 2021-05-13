@@ -3,6 +3,50 @@ import podcastClient from "../../client/PodcastClient";
 import { IPodcast } from "../../Models/Podcast/Podcast";
 
 class PodcastService extends BaseService {
+  private abortControllers = new Map<string, AbortController>();
+  public async downloadPodcast(podcast: IPodcast) {
+    const cache = await window.caches.open("podcasts");
+    if (await window.caches.has("podcasts")) {
+      if (await cache.match(podcast.src)) {
+        return await cache.match(podcast.src);
+      }
+    }
+
+    const controller = new AbortController();
+    const { signal } = controller;
+    this.abortControllers.set(podcast.id, controller);
+
+    try {
+      const response = await fetch(podcast.src, { signal });
+      let chunks: Uint8Array[] = [];
+      let downloaded = 0;
+      let lastUpdated = 0;
+      const reader = response.body?.getReader();
+      while (reader) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        downloaded += value?.length || 0;
+        value && chunks.push(value);
+        const now = Date.now();
+        const progress = downloaded / podcast.size;
+        if (now - lastUpdated > 500 || progress === 1) {
+          lastUpdated = now;
+        }
+        console.log(`Progress: ${progress}`);
+
+        const resp = new Response(new Blob(chunks), {
+          headers: response.headers,
+        });
+        cache.put(podcast.src, resp);
+      }
+    } catch (error) {
+      console.error(
+        `There was an error downloading the podcast ${podcast.title}`,
+        error
+      );
+    }
+  }
   public async getItemsFromFeed(response: Response): Promise<IPodcast[]> {
     const dom = new DOMParser().parseFromString(
       await response.text(),
