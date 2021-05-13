@@ -2,21 +2,17 @@ import { h, Component } from "preact";
 // import style from './style.css';
 import style from "./style.module.scss";
 import podcastService from "../../service/Podcast/PodcastService";
+import { IPodcast } from "../../Models/Podcast/Podcast";
 
 const CACHE_NAME = "dynamic";
 
-interface IPodcast {
-  id: string;
-  src: string;
-  image: string;
-  title: string;
-  subtitle: string;
-  duration: string;
-  size: number;
+interface IPodcastState extends IPodcast {
+  state: "stored" | "not-stored";
+  progress: number;
 }
 interface Props {}
 interface State {
-  podcasts: IPodcast[];
+  podcasts: IPodcastState[];
 }
 
 export default class Home extends Component<Props, State> {
@@ -33,23 +29,48 @@ export default class Home extends Component<Props, State> {
       const cachedFeed = await cache?.match("/feed");
 
       if (cachedFeed) {
+        const podcasts = [];
+        const podcastsTmp = await podcastService.getItemsFromFeed(cachedFeed);
+        for (let i = 0; i < podcastsTmp.length; i++) {
+          const p = podcastsTmp[i];
+          const isPodcastStored = await podcastService.isPodcastStored(p);
+
+          podcasts[i] = {
+            ...podcastsTmp[i],
+            state: isPodcastStored ? "stored" : "not-stored",
+            progress: isPodcastStored ? 1 : 0,
+          };
+        }
+
         // eslint-disable-next-line react/no-did-mount-set-state
-        this.setState({
-          podcasts: await podcastService.getItemsFromFeed(cachedFeed),
-        });
+        this.setState({ podcasts });
       }
 
       podcastService
         .fetchPodcasts((networkFeed) => {
           cache.put("/feed", networkFeed.clone());
         })
-        .then((feeds) => {
-          this.setState({ podcasts: feeds });
+        .then(async (podcastsTmp) => {
+          const podcasts = [];
+          for (let i = 0; i < podcastsTmp.length; i++) {
+            const p = podcastsTmp[i];
+            const isPodcastStored = await podcastService.isPodcastStored(p);
+
+            podcasts[i] = {
+              ...podcastsTmp[i],
+              state: isPodcastStored ? "stored" : "not-stored",
+              progress: isPodcastStored ? 1 : 0,
+            };
+          }
+
+          // eslint-disable-next-line react/no-did-mount-set-state
+          this.setState({ podcasts });
         });
     }
   }
   render() {
     const { podcasts } = this.state;
+    console.log(podcasts);
     return (
       <div class={style.home}>
         <h1 class={style["site-title"]}>

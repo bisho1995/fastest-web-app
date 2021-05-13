@@ -4,6 +4,10 @@ import { IPodcast } from "../../Models/Podcast/Podcast";
 
 class PodcastService extends BaseService {
   private abortControllers = new Map<string, AbortController>();
+  public async isPodcastStored(podcast: IPodcast): Promise<Boolean> {
+    const cache = await window.caches.open("podcasts");
+    return !!(await cache.match(podcast.src));
+  }
   public async downloadPodcast(podcast: IPodcast) {
     const cache = await window.caches.open("podcasts");
     if (await window.caches.has("podcasts")) {
@@ -39,6 +43,7 @@ class PodcastService extends BaseService {
           headers: response.headers,
         });
         cache.put(podcast.src, resp);
+        return resp;
       }
     } catch (error) {
       console.error(
