@@ -103,10 +103,9 @@ export default class Home extends Component<Props, State> {
               subtitle={subtitle}
               state={state}
               onClick={() => {
+                this.setState({ playing: podcast });
                 if (state === "not-stored") {
                   podcastService.downloadPodcast(podcast);
-                } else {
-                  this.setState({ playing: podcast });
                 }
               }}
             />

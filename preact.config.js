@@ -22,5 +22,6 @@ export default {
    * */
   webpack(config, env, helpers, options) {
     /** you can change the config here * */
+    config.node.process = true
   },
 };
