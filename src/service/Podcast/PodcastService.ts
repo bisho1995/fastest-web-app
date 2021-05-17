@@ -4,15 +4,43 @@ import { IPodcast } from "../../Models/Podcast/Podcast";
 
 class PodcastService extends BaseService {
   private abortControllers = new Map<string, AbortController>();
+  private static readonly PODCAST_CACHE = "podcasts";
+  private async getPodcastCache() {
+    return await window.caches.open(PodcastService.PODCAST_CACHE);
+  }
   public async isPodcastStored(podcast: IPodcast): Promise<Boolean> {
-    const cache = await window.caches.open("podcasts");
+    const cache = await this.getPodcastCache();
     return !!(await cache.match(podcast.src));
   }
+
+  public getPodcastUrl(url: string): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      const cache = await this.getPodcastCache();
+      const content = await cache.match(url);
+      if (!content)
+        return reject(
+          new Error(`The podcast for this url ${url} is not stored`)
+        );
+
+      return content
+        .blob()
+        .then((b) => {
+          console.log(b);
+          resolve(URL.createObjectURL(b));
+        })
+        .catch(reject);
+    });
+  }
+
   public async downloadPodcast(podcast: IPodcast) {
-    const cache = await window.caches.open("podcasts");
-    if (await window.caches.has("podcasts")) {
+    console.log(`Attempting to download podcase ${podcast}`);
+    const cache = await window.caches.open(PodcastService.PODCAST_CACHE);
+    if (await window.caches.has(PodcastService.PODCAST_CACHE)) {
       if (await cache.match(podcast.src)) {
-        return await cache.match(podcast.src);
+        {
+          console.log(`Podcast found in cache`);
+          return await cache.match(podcast.src);
+        }
       }
     }
 
@@ -66,6 +94,7 @@ class PodcastService extends BaseService {
         domItem.querySelector("enclosure")!.attributes.url.value
       )!;
       src.protocol = "https";
+      // @ts-ignore
       const id = `podcast-${/\/([^\/]+)\.(mp3|m4a)($|\?)/.exec(src)[1]}`;
       const image = new URL(
         domItem.querySelector("image")!.getAttribute("href")!
@@ -85,19 +114,15 @@ class PodcastService extends BaseService {
       };
     });
 
+    // @ts-ignore
     return await Promise.all(itemPromises);
   }
-  public async fetchPodcasts(
-    onGotPodcast?: (response: Response) => void
-  ): Promise<IPodcast[]> {
+  public async fetchPodcasts(): Promise<Response> {
     return new Promise((resolve, reject) => {
       podcastClient
         .fetchPodcasts()
-        .then(async (resp) => {
-          onGotPodcast && onGotPodcast(resp);
-          const items = await this.getItemsFromFeed(resp);
-
-          resolve(items);
+        .then((resp) => {
+          resolve(resp);
         })
         .catch(reject);
     });
