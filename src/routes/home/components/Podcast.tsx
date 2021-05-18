@@ -80,7 +80,7 @@ export default function Podcast({
 }: IProps) {
   return (
     <div class="flex flex-row">
-      <img alt={`${title}-podcast`} src={image} width={100} height={100} />
+      <img alt={`${title}-podcast`} src={image} width={100} height={100} crossOrigin="Anonymous" />
       <div class="flex flex-col flex-1  ">
         <div class="font-semibold leading-5" onClick={onClick}>
           {title}

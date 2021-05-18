@@ -57,8 +57,8 @@ export default class Home extends Component<Props, State> {
 
   async componentDidMount() {
     if (globalThis?.navigator?.storage?.persist) {
-      globalThis.navigator.storage.persist().then((persistent) => {
-        console.log(persistent);
+      globalThis.navigator.storage.persist().then(() => {
+        // console.log(persistent);
       });
 
       /**
@@ -91,7 +91,11 @@ export default class Home extends Component<Props, State> {
     return (
       <div class={style.home}>
         <h1 class={style["site-title"]}>
-          <img src={HERO_IMAGE} alt="HTTP 203 Podcast" />
+          <img
+            src={HERO_IMAGE}
+            alt="HTTP 203 Podcast"
+            crossOrigin="Anonymous"
+          />
         </h1>
         {podcasts.map((podcast: IPodcastState) => {
           const { id, title, subtitle, image, state } = podcast;

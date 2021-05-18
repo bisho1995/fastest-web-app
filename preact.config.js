@@ -1,4 +1,18 @@
 // ... imports or other code up here ...
+const path = require("path");
+const { InjectManifest } = require("workbox-webpack-plugin");
+const webpack = require("webpack");
+
+function findPath(a, obj, path = "") {
+  if (typeof obj !== "object" || Array.isArray(obj)) return "";
+  let ans = "";
+  for (const key of Object.keys(obj)) {
+    if (key === a) return path;
+    ans += findPath(a, obj[key], `${path}/${key}`);
+  }
+
+  return ans;
+}
 
 // these props are both optional
 export default {
@@ -22,6 +36,27 @@ export default {
    * */
   webpack(config, env, helpers, options) {
     /** you can change the config here * */
-    config.node.process = true
+    config.node.process = true;
+    console.log("NODE_ENV => ", process.env.NODE_ENV);
+    console.log(config.plugins.length);
+    const fs = require("fs");
+    fs.writeFileSync("config.json", JSON.stringify(env));
+    const isDevelopment = process.env.NODE_ENV === "development";
+    if (isDevelopment) {
+      const swPath = path.join(__dirname, "src", path.sep, "sw.js");
+
+      config.plugins.push(
+        new InjectManifest({
+          swSrc: swPath,
+          include: [
+            /200\.html$/,
+            /\.js$/,
+            /\.css$/,
+            /\.(png|jpg|svg|gif|webp)$/,
+          ],
+          exclude: [/\.esm\.js$/],
+        })
+      );
+    }
   },
 };

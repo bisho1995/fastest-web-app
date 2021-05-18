@@ -1,9 +1,10 @@
 import { registerRoute, setCatchHandler } from "workbox-routing";
-import { NetworkFirst } from "workbox-strategies";
+import { CacheFirst, NetworkFirst } from "workbox-strategies";
 import { cacheNames } from "workbox-core";
 import { precacheAndRoute, getCacheKeyForURL } from "workbox-precaching";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { getFiles } from "preact-cli/sw/";
+import { ExpirationPlugin } from "workbox-expiration";
 
 console.log("cacheNames.precache", cacheNames.precache);
 
@@ -24,9 +25,20 @@ const networkHandler = new NetworkFirst({
  * the navigation requests even if they are in precache.
  */
 registerRoute(({ event }) => {
-  console.log(event);
   return isNav(event);
 }, networkHandler);
+
+registerRoute(
+  ({ request }) => request.destination === "image",
+  new CacheFirst({
+    cacheName: "images",
+    plugins: [
+      new ExpirationPlugin({
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+      }),
+    ],
+  })
+);
 
 setCatchHandler(({ event }) => {
   console.log("in catch", event);
@@ -37,5 +49,5 @@ setCatchHandler(({ event }) => {
 });
 
 const filesToCache = getFiles();
-console.log(filesToCache);
+console.log("filesToCache => ", filesToCache);
 precacheAndRoute(filesToCache);
