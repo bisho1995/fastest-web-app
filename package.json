@@ -27,6 +27,7 @@
     "workbox-webpack-plugin": "^5.x"
   },
   "dependencies": {
+    "cypress": "^7.3.0",
     "preact": "^10.3.1",
     "preact-cli": "^3.0.0",
     "preact-render-to-string": "^5.1.4",
