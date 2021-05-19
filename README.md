@@ -49,3 +49,7 @@ Extracted the service worker code from preact-cli/sw and using this in my custom
 1. Preact provides a list of assets which we can provide to workbox to cache them.
 2. We use different modules of workbox to define the caching strategies
 3. We follow a network first approach, aka first check the network then put in cache.
+
+
+## Testing
+https://preactjs.com/guide/v10/preact-testing-library/
