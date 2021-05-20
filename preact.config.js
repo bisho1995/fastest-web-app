@@ -42,6 +42,7 @@ export default {
       ],
     };
 
+    console.log("===== walking through preact.config.js ==============")
     if (isDevelopment && env.esm && env.sw) {
       config.plugins.push(
         new InjectManifest({
@@ -66,21 +67,5 @@ export default {
       );
     }
 
-    // if (isDevelopment) {
-    //   const swPath = path.join(__dirname, "src", path.sep, "sw.js");
-
-    //   config.plugins.push(
-    //     new InjectManifest({
-    //       swSrc: swPath,
-    //       include: [
-    //         /200\.html$/,
-    //         /\.js$/,
-    //         /\.css$/,
-    //         /\.(png|jpg|svg|gif|webp)$/,
-    //       ],
-    //       exclude: [/\.esm\.js$/],
-    //     })
-    //   );
-    // }
   },
 };
