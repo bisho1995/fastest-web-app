@@ -3,16 +3,7 @@ const path = require("path");
 const { InjectManifest } = require("workbox-webpack-plugin");
 const webpack = require("webpack");
 
-function findPath(a, obj, path = "") {
-  if (typeof obj !== "object" || Array.isArray(obj)) return "";
-  let ans = "";
-  for (const key of Object.keys(obj)) {
-    if (key === a) return path;
-    ans += findPath(a, obj[key], `${path}/${key}`);
-  }
 
-  return ans;
-}
 
 // these props are both optional
 export default {
@@ -41,7 +32,7 @@ export default {
     const swPath = path.join(__dirname, "src", path.sep, "sw.js");
 
     const commonInjectManifestConfig = {
-      maximumFileSizeToCacheInBytes: 1024 * 1024 * 1024, // 1gb
+      // maximumFileSizeToCacheInBytes: 1024 * 1024 * 1024, // 1gb
       swSrc: swPath,
       include: [
         /^\/?index\.html$/,
@@ -68,6 +59,7 @@ export default {
     if (isDevelopment && env.sw) {
       config.plugins.push(
         new InjectManifest({
+          ...commonInjectManifestConfig,
           swSrc: swPath,
           exclude: [/\.esm\.js$/],
         })
