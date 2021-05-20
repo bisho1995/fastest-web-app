@@ -37,26 +37,58 @@ export default {
   webpack(config, env, helpers, options) {
     /** you can change the config here * */
     config.node.process = true;
-    console.log("NODE_ENV => ", process.env.NODE_ENV);
-    console.log(config.plugins.length);
-    const fs = require("fs");
-    fs.writeFileSync("config.json", JSON.stringify(env));
     const isDevelopment = process.env.NODE_ENV === "development";
-    if (isDevelopment) {
-      const swPath = path.join(__dirname, "src", path.sep, "sw.js");
+    const swPath = path.join(__dirname, "src", path.sep, "sw.js");
 
+    const commonInjectManifestConfig = {
+      maximumFileSizeToCacheInBytes: 1024 * 1024 * 1024, // 1gb
+      swSrc: swPath,
+      include: [
+        /^\/?index\.html$/,
+        /\.esm.js$/,
+        /\.css$/,
+        /\.(png|jpg|svg|gif|webp)$/,
+      ],
+    };
+
+    if (isDevelopment && env.esm && env.sw) {
+      config.plugins.push(
+        new InjectManifest({
+          ...commonInjectManifestConfig,
+          swDest: "sw-esm.js",
+          webpackCompilationPlugins: [
+            new webpack.DefinePlugin({
+              "process.env.ESM": true,
+            }),
+          ],
+        })
+      );
+    }
+
+    if (isDevelopment && env.sw) {
       config.plugins.push(
         new InjectManifest({
           swSrc: swPath,
-          include: [
-            /200\.html$/,
-            /\.js$/,
-            /\.css$/,
-            /\.(png|jpg|svg|gif|webp)$/,
-          ],
           exclude: [/\.esm\.js$/],
         })
       );
     }
+
+    // if (isDevelopment) {
+    //   const swPath = path.join(__dirname, "src", path.sep, "sw.js");
+
+    //   config.plugins.push(
+    //     new InjectManifest({
+    //       swSrc: swPath,
+    //       include: [
+    //         /200\.html$/,
+    //         /\.js$/,
+    //         /\.css$/,
+    //         /\.(png|jpg|svg|gif|webp)$/,
+    //       ],
+    //       exclude: [/\.esm\.js$/],
+    //     })
+    //   );
+    // }
   },
 };
